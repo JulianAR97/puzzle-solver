@@ -69,9 +69,16 @@ const fillMatrix = (nRows, nCols, value) => {
   return a
 }
 
+const benchmark = (cb, args = []) => {
+  let ts = Date.now()
+  cb(...args)
+  console.log(`Completed in ${((Date.now() - ts) / 1000)} seconds`)
+}
+
 module.exports = {
   rotateMatrix,
   arrayDiff,
   deepCopy,
-  fillMatrix
+  fillMatrix,
+  benchmark
 }
