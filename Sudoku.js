@@ -5,7 +5,7 @@ class Sudoku {
     this.solution = null
   }
   
-   validRow(row) {
+  validRow(row) {
     let filterRow = row.filter(Boolean)
     let uniqueRow = filterRow.filter((e, i, a) => a.indexOf(e) === i)
     if (filterRow.join('') != uniqueRow.join('')) return false
@@ -119,8 +119,8 @@ class Sudoku {
   }
 
   solve() {
-    if (this.solution) 
-      return this.solution;
+    if (this.solution) return this.solution;
+    if (!this.checkValid) return 'This is not a valid puzzle'
     
     this.solution = Helpers.deepCopy(this.puzzle)
     this.preliminarySolve()
