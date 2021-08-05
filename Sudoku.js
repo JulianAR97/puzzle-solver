@@ -29,7 +29,7 @@ class Sudoku {
 
   checkBoxes() {
     let boxes = [];
-    for (let i = 0; i < this.puzzle.length; i++) boxes.push([])
+    for (let x of this.puzzle.length) boxes.push([])
 
     for (let i = 0; i < this.puzzle.length; i++) {
       for (let j = 0; j < this.puzzle.length; j++) {
@@ -46,6 +46,43 @@ class Sudoku {
     return true
   }
 
+  solvedRows() {
+    for (let i = 0; i < this.solution.length; i++) {
+      if (Helpers.arrayDiff([1, 2, 3, 4, 5, 6, 7, 8, 9], this.solution[i])[0]) return false;
+    }
+    return true
+  }
+
+  solvedCols() {
+    let rotated = Helpers.rotateMatrix(this.solution);
+    for (let i = 0; i < rotated.length; i++) {
+      if (Helpers.arrayDiff([1, 2, 3, 4, 5, 6, 7, 8, 9], rotated[i])[0]) return false;
+    }
+    return true
+  }
+
+  solvedBoxes() {
+    let boxes = [];
+    for (let i = 0; i < this.solution.length; i++) boxes.push([])
+
+    for (let i = 0; i < this.solution.length; i++) {
+      for (let j = 0; j < this.solution[i].length; j++) {
+        let val = this.solution[i][j];
+        let boxIdx = Math.floor((i / 3)) * 3 + Math.floor(j / 3);
+        if (boxes[boxIdx].includes(val)) return false
+        if (val) boxes[boxIdx].push(val)
+      }
+    }
+    return true
+  }
+
+  solved() {
+    return (
+      this.solvedRows() &&
+      this.solvedCols() &&
+      this.solvedBoxes()
+    )
+  }
   
   checkValid() {
     return (
@@ -112,6 +149,18 @@ class Sudoku {
     }
   }
 
+  static sortNumPossiblities(arr) {
+    let numPossiblities = [];
+
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
+        let p = arr[i][j]; // ele is either null or [x, y, ...]
+        if (p) numPossiblities.push({i, j, p})
+      }
+    }
+    return numPossiblities.sort((a, b) => a.p.length - b.p.length)
+  }
+
   static getMutables(array) {
     let copy = Helpers.deepCopy(array);
     let mutables = copy.map(row => row.map(ele => !ele))
@@ -126,37 +175,34 @@ class Sudoku {
     this.preliminarySolve()
     let mutables = Sudoku.getMutables(this.solution)
     let pValIndices = Helpers.fillMatrix(9, 9, 0)
-    let incrementor = 1;
-    let start = 0
+    let lastSolved= [];
 
-    for (let i = 0; 0 <= i && i < this.solution.length; i += incrementor) {
-      for (let j = start; 0 <= j && j < this.solution[i].length; j += incrementor) {
-        if (!mutables[i][j]) continue; // if the cell is not mutable
-           
-        // Check to see if we are currently backtracking, and go to next possible value if we are
-        if (this.solution[i][j] > 0) {
-          pValIndices[i][j]++
-          this.solution[i][j] = 0;
-        }
-
-        let puzzlePVals = this.getPossibleValues()
-        let pVals = puzzlePVals[i][j]
-
-        let val = pVals[pValIndices[i][j]]
-     
-        if (val) {
-          this.solution[i][j] = val
-          incrementor = 1;
-          start = 0;
-        } else {
-          pValIndices[i][j] = 0;
-          incrementor = -1;
-          start = 8;
-        }
+    while (!this.solved()) {
+      let puzzlePVals = this.getPossibleValues()
+      let sortedPVals = Sudoku.sortNumPossiblities(puzzlePVals)
+      // if our sorted array of possibilities has no possiblities at index 0, we need to backtrack
+      let pVal = sortedPVals[0]
+      let pValIDX = pValIndices[pVal.i][pVal.j]
+      if (!pVal.p[pValIDX]) {
+        /*
+          backtrack
+          increase pValIndice of last visited by one
+          ls = lastSolved.pop()
+          pValIndices[ls.i][ls.j]++
+        */
+        let ls = lastSolved.pop()
+        pValIndices[ls.i][ls.j]++
+        pValIndices[pVal.i][pVal.j] = 0;
+        this.solution[ls.i][ls.j] = 0;
+        continue;
+      } else {
+        this.solution[pVal.i][pVal.j] = pVal.p[pValIDX]
+        lastSolved.push(pVal)
       }
+      
     }
-
-    return this.solution
+    
+    return 
   }
 
 }
