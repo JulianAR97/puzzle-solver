@@ -155,7 +155,7 @@ class Sudoku {
         }
       }
     }
-    console.log(this.solution)
+
     return this.solution
   }
 
