@@ -76,17 +76,12 @@ class Sudoku {
       let pVal = sortedPVals[0]
       let pValIDX = pValIndices[pVal.i][pVal.j]
       if (!pVal.p[pValIDX]) {
-        /*
-        backtrack
-        increase pValIndice of last visited by one
-        ls = lastSolved.pop()
+        // backtrack
+        let ls = lastSolved.pop()
         pValIndices[ls.i][ls.j]++
-        */
-       let ls = lastSolved.pop()
-       pValIndices[ls.i][ls.j]++
-       pValIndices[pVal.i][pVal.j] = 0;
-       this.solution[ls.i][ls.j] = 0;
-       continue;
+        pValIndices[pVal.i][pVal.j] = 0;
+        this.solution[ls.i][ls.j] = 0;
+        continue;
       } else {
         this.solution[pVal.i][pVal.j] = pVal.p[pValIDX]
         lastSolved.push(pVal)
