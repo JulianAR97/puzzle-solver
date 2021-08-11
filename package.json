@@ -1,5 +1,5 @@
 {
-  "name": "puzzleSolver",
+  "name": "puzzle-solver",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Julian <julianrosenthal@yahoo.com>",
