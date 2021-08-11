@@ -5,14 +5,30 @@ class Sudoku {
     this.solution = null
   }
   
-
-
   static valid(puzzle) {
     return (
       Sudoku.#validRows(puzzle) &&
       Sudoku.#validBoxs(puzzle) &&
       Sudoku.#validCols(puzzle)
     )
+  }
+
+  /** 
+   * Takes a one dimensional array of 81 values and returns a 9x9 matrix
+   * @param {Object} puzzle
+   * @return puzzleMatrix
+  */
+  static convertToMatrix(puzzle) {
+    let matrix = [];
+    let local = [];
+    for (let i = 0; i < puzzle.length; i++) {
+      local.push(puzzle[i])
+      if (local.length === 9) {
+        matrix.push(local);
+        local = [];
+      }
+    }
+    return matrix
   }
 
   solved() {
@@ -62,7 +78,7 @@ class Sudoku {
   
   solve() {
     if (this.solution) return this.solution;
-    if (!Sudoku.valid(this.puzzle)) return 'This is not a valid puzzle'
+    if (!Sudoku.valid(this.puzzle)) return this.puzzle
     
     this.solution = Helpers.deepCopy(this.puzzle)
 
